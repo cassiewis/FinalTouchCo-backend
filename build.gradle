@@ -1,0 +1,69 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.4'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'Website'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web' 
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.567'
+
+
+    // AWS SDK for DynamoDB (version 2.x)
+    implementation 'software.amazon.awssdk:dynamodb:2.20.86'
+	implementation 'software.amazon.awssdk:dynamodb-enhanced:2.20.86'  // Use the latest version
+
+    // AWS SDK for S3 (version 2.x)
+    implementation 'software.amazon.awssdk:s3:2.20.92'
+
+	// AWS SDK for Secrets Manager (version 2.x)
+	implementation 'software.amazon.awssdk:secretsmanager:2.20.0' 
+
+    // AWS SDK Core (needed for both DynamoDB and S3)
+    implementation 'software.amazon.awssdk:core:2.20.92'
+	implementation 'mysql:mysql-connector-java:8.0.29' // Use the appropriate version
+
+
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2' // Jackson for JSON parsing
+
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-config'
+	implementation 'org.springframework.security:spring-security-web'
+
+
+
+	// Logging
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+	implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
