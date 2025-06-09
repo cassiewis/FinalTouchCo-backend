@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import Website.EventRentals.model.ApiResponse;
 import Website.EventRentals.model.Reservation;
 import Website.EventRentals.service.AdminS3ServiceReservation;
+import Website.EventRentals.service.S3ServiceReservation;
 
 @RestController
 @RequestMapping("/api/admin/reservations")
@@ -25,10 +27,12 @@ import Website.EventRentals.service.AdminS3ServiceReservation;
 public class AdminReservationController {
 
     private final AdminS3ServiceReservation adminS3ServiceReservation;
+    private final S3ServiceReservation s3ServiceReservation;
 
     // Constructor injection for S3ServiceReservation
-    public AdminReservationController(AdminS3ServiceReservation adminS3ServiceReservation) {
+    public AdminReservationController(AdminS3ServiceReservation adminS3ServiceReservation, S3ServiceReservation s3ServiceReservation) {
         this.adminS3ServiceReservation = adminS3ServiceReservation;
+        this.s3ServiceReservation = s3ServiceReservation;
     }
 
     // Endpoint for fetching all reservations
@@ -67,6 +71,21 @@ public class AdminReservationController {
         try {
             Reservation reservation = adminS3ServiceReservation.getReservation(reservationId);
             return ResponseEntity.ok(new ApiResponse<>(true, reservation, "Reservation fetched successfully"));
+        } catch (IllegalArgumentException e) { // Client-side error (e.g., invalid status or reservation ID)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, null, e.getMessage()));
+        } catch (Exception e) { // Server-side error (e.g., unexpected exception)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(false, null, "An unexpected error occurred: " + e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<ApiResponse<Reservation>> addReservation(@RequestBody Reservation reservation) {
+        try {
+            Reservation addedReservation = s3ServiceReservation.addReservation(reservation);
+            return ResponseEntity.ok(new ApiResponse<>(true, addedReservation, "Reservation added successfully"));
         } catch (IllegalArgumentException e) { // Client-side error (e.g., invalid status or reservation ID)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse<>(false, null, e.getMessage()));
