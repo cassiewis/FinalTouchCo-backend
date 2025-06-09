@@ -18,7 +18,7 @@ import Website.EventRentals.shared.model.ReservedDate;
 
 @RestController
 @RequestMapping("/api/reservedDates")
-@CrossOrigin(origins = "http://192.168.0.145:4200", allowedHeaders = "*", methods = { RequestMethod.GET})
+@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET})
 public class ReservedDateController {
 
     private final DynamoDbReservedDateService dynamoDbReservedDateService;

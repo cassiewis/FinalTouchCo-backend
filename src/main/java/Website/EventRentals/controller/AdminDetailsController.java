@@ -1,6 +1,7 @@
 package Website.EventRentals.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,9 +20,12 @@ import Website.EventRentals.service.AdminS3ServiceDetails;
 
 @RestController
 @RequestMapping("/api/admin/details")
-@CrossOrigin(origins = "http://192.168.0.145:4200", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE })
+@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE })
 public class AdminDetailsController {
 
+    @Value("${app.frontendUrl}")
+    private String frontendUrl;
+    
     private final AdminS3ServiceDetails adminS3ServiceDetails;
 
     @Autowired

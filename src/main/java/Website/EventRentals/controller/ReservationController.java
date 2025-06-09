@@ -15,7 +15,7 @@ import Website.EventRentals.service.S3ServiceReservation;
 
 @RestController
 @RequestMapping("/api/reservations")
-@CrossOrigin(origins = "http://192.168.0.145:4200", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST })
+@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST })
 public class ReservationController {
 
     private final S3ServiceReservation s3ServiceReservation;

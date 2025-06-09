@@ -23,7 +23,7 @@ import Website.EventRentals.service.AdminS3ServiceProduct;
 
 @RestController
 @RequestMapping("/api/admin/products")
-@CrossOrigin(origins = "http://192.168.0.145:4200", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
+@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 public class AdminProductController {
 
     private final AdminS3ServiceProduct adminS3ServiceProduct;

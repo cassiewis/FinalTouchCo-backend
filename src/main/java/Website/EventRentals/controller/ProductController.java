@@ -18,7 +18,7 @@ import Website.EventRentals.service.S3ServiceProduct;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "http://192.168.0.145:4200", allowedHeaders = "*", methods = { RequestMethod.GET })
+@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET })
 public class ProductController {
 
     private final S3ServiceProduct s3ServiceProduct;
