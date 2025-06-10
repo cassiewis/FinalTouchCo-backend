@@ -2,6 +2,7 @@ package Website.EventRentals.controller;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -25,6 +26,9 @@ import Website.EventRentals.service.S3ServiceReservation;
 public class ReservationController {
 
     private final S3ServiceReservation s3ServiceReservation;
+
+    @Value("${recaptcha.secret}")
+    private String recaptchaSecret;
 
     // Constructor injection for S3ServiceReservation
     public ReservationController(S3ServiceReservation s3ServiceReservation) {
@@ -53,11 +57,10 @@ public class ReservationController {
 
     // Example: In your reservation controller/service
     public boolean verifyRecaptcha(String token) {
-        String secret = "your_secret_key";
         String url = "https://www.google.com/recaptcha/api/siteverify";
         RestTemplate restTemplate = new RestTemplate();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("secret", secret);
+        params.add("secret", recaptchaSecret);
         params.add("response", token);
 
         ResponseEntity<Map> response = restTemplate.postForEntity(url, params, Map.class);
