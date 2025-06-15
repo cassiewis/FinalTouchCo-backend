@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import Website.EventRentals.model.ApiResponse;
 import Website.EventRentals.model.Review;
 import Website.EventRentals.service.AdminS3ServiceDetails;
+import Website.EventRentals.model.BlockoutDates;
 
 @RestController
 @RequestMapping("/api/admin/details")
@@ -36,7 +39,6 @@ public class AdminDetailsController {
     @PreAuthorize("hasRole('Admin')")
     @PostMapping("/reviews")
     public ResponseEntity<ApiResponse<Review>> addReview(@RequestBody Review review) {
-        System.out.println("CASSIE addReview hit in controller");
         try {
             adminS3ServiceDetails.addReview(review);
             return ResponseEntity.ok(new ApiResponse<>(true, review, "Review added successfully"));
@@ -54,7 +56,6 @@ public class AdminDetailsController {
     @PreAuthorize("hasRole('Admin')")
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<ApiResponse<String>> removeReview(@PathVariable String reviewId) {
-        System.out.println("CASSIE removeReview hit in controller");
         try {
             adminS3ServiceDetails.removeReview(reviewId);
             return ResponseEntity.ok(new ApiResponse<>(true, reviewId, "Review removed successfully"));
@@ -62,6 +63,47 @@ public class AdminDetailsController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse<>(false, null, e.getMessage()));
         } catch (Exception e) { // Server-side error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(false, null, "An unexpected error occurred: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/blockoutdates")
+    public ResponseEntity<ApiResponse<List<BlockoutDates>>> getAllBlockoutDates() {
+        try {
+            List<BlockoutDates> blockoutDates = adminS3ServiceDetails.getAllBlockoutDates();
+            return ResponseEntity.ok(new ApiResponse<>(true, blockoutDates, "BlockoutDates retrieved successfully"));
+        } catch (IllegalArgumentException e) { // Client-side error
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, null, e.getMessage()));
+        } catch (Exception e) { // Server-side error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(false, null, "An unexpected error occurred: " + e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('Admin')")
+    @PostMapping("/blockoutdates")
+    public ResponseEntity<ApiResponse<BlockoutDates>> addBlockoutDates(@RequestBody BlockoutDates blockoutDates) {
+        try {
+            adminS3ServiceDetails.addBlockoutDates(blockoutDates);
+            return ResponseEntity.ok(new ApiResponse<>(true, blockoutDates, "BlockoutDates added successfully"));
+        } catch (IllegalArgumentException e) { // Client-side error
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, null, e.getMessage()));
+        } catch (Exception e) { // Server-side error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(false, null, "An unexpected error occurred: " + e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasRole('Admin')")
+    @DeleteMapping("/blockoutdates/{id}")
+    public ResponseEntity<ApiResponse<String>> removeBlockoutDate(@PathVariable String id) {
+        try {
+            adminS3ServiceDetails.removeBlockoutDates(id);
+            return ResponseEntity.ok(new ApiResponse<>(true, id, "BlockoutDate removed successfully"));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse<>(false, null, "An unexpected error occurred: " + e.getMessage()));
         }

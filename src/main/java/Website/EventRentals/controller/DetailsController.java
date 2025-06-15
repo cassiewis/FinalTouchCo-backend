@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import Website.EventRentals.model.AddOnItem;
 import Website.EventRentals.model.ApiResponse;
 import Website.EventRentals.model.Review;
+import Website.EventRentals.model.BlockoutDates;
 import Website.EventRentals.service.S3ServiceDetails;
 
 @RestController
@@ -35,6 +36,20 @@ public class DetailsController {
         try {
             List<Review> reviews = s3ServiceDetails.getAllReviews();
             return ResponseEntity.ok(new ApiResponse<>(true, reviews, "Reviews retrieved successfully"));
+        } catch (IllegalArgumentException e) { // Client-side error
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, null, e.getMessage()));
+        } catch (Exception e) { // Server-side error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(false, null, "An unexpected error occurred: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/blockoutdates")
+    public ResponseEntity<ApiResponse<List<String>>> getAllBlockoutDates() {
+        try {
+            List<String> blockoutDates = s3ServiceDetails.getAllBlockoutDates();
+            return ResponseEntity.ok(new ApiResponse<>(true, blockoutDates, "BlockoutDates retrieved successfully"));
         } catch (IllegalArgumentException e) { // Client-side error
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse<>(false, null, e.getMessage()));
