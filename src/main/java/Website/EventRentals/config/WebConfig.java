@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins(frontendUrl, "http://192.168.0.42:4200/")
+                        .allowedOrigins(frontendUrl, "http://192.168.0.46:4200/")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("Content-Type", "Authorization", "X-Recaptcha-Token")
                         .allowCredentials(true);

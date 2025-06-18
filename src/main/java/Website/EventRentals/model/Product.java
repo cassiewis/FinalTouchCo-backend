@@ -7,6 +7,7 @@ public class Product {
     private boolean custom;
     private boolean active;
     private String name;
+    private int quantity;
     private double price;
     private double deposit;
     private String description;
@@ -47,6 +48,14 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public double getPrice() {

@@ -75,6 +75,11 @@ public class S3ServiceProduct {
             throw new RuntimeException("Error fetching product from S3", e);
         } catch (IOException e) {
             throw new RuntimeException("Error reading product data", e);
+        } catch (Exception e) {
+            System.out.println("ERROR mapping product for key: " + key);
+            // System.out.println("Raw JSON: " + productJson);
+            e.printStackTrace();
+            return null;
         }
     }
 
