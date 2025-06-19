@@ -53,7 +53,7 @@ public class ReservationController {
                     HttpServletRequest request
                     ) {
         
-        String ip = request.getRemoteAddr();
+        String ip = getClientIP(request);
         Bucket bucket = resolveBucket(ip);
 
         if (!bucket.tryConsume(1)) {
@@ -99,9 +99,17 @@ public class ReservationController {
     // Add this map to store buckets per IP
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
+    private String getClientIP(HttpServletRequest request) {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null) {
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0].trim();
+    }
+
     private Bucket resolveBucket(String ip) {
         return buckets.computeIfAbsent(ip, k -> Bucket4j.builder()
-            .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(60))))
+            .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1))))
             .build());
     }
 }
