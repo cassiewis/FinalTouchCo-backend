@@ -48,8 +48,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-config'
 	implementation 'org.springframework.security:spring-security-web'
-
-
+	implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:8.0.1'
 
 	// Logging
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
