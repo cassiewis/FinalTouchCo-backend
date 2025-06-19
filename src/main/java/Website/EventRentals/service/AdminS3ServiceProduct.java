@@ -105,7 +105,7 @@ public class AdminS3ServiceProduct {
 
     // Update an existing product in S3
     public Product updateProduct(String productId, Product updatedProduct) {
-        String key = productId + ".json";
+        String key = productId.endsWith(".json") ? productId : productId + ".json";
         String updatedProductJson = productToJson(updatedProduct);
         try {
             s3Client.putObject(
