@@ -37,7 +37,20 @@ public class ReservationController {
 
     // Endpoint for uploading a reservation
     @PostMapping
-    public ResponseEntity<ApiResponse<Reservation>> addReservation(@RequestBody Reservation reservation, @RequestHeader("X-Recaptcha-Token") String recaptchaToken) {
+    public ResponseEntity<ApiResponse<Reservation>> addReservation(
+                    @RequestBody Reservation reservation,
+                    @RequestHeader("X-Recaptcha-Token") String recaptchaToken,
+                    HttpServletRequest request
+                    ) {
+        
+        String ip = request.getRemoteAddr();
+        Bucket bucket = resolveBucket(ip);
+
+        if (!bucket.tryConsume(1)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ApiResponse<>(false, null, "Too many requests. Please try again later."));
+        }
+        
         if (verifyRecaptcha(recaptchaToken)) {
             try {
                 Reservation addedReservation = s3ServiceReservation.addReservation(reservation);
@@ -68,4 +81,17 @@ public class ReservationController {
         return (Boolean) body.get("success");
     }
 
+
+/**************************************************
+ ***       IP Rate Limiting with Bucket4j      ***
+ *************************************************/
+
+    // Add this map to store buckets per IP
+    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+
+    private Bucket resolveBucket(String ip) {
+        return buckets.computeIfAbsent(ip, k -> Bucket4j.builder()
+            .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(60))))
+            .build());
+    }
 }
