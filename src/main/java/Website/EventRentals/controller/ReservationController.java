@@ -112,7 +112,7 @@ public class ReservationController {
 
     private Bucket resolveBucket(String ip) {
         return buckets.computeIfAbsent(ip, k -> Bucket4j.builder()
-            .addLimit(Bandwidth.classic(50, Refill.greedy(50, Duration.ofMinutes(1))))
+            .addLimit(Bandwidth.classic(10, Refill.greedy(10, Duration.ofHours(1))))
             .build());
     }
 }
