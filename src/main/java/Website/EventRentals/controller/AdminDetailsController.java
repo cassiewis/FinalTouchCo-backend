@@ -23,7 +23,7 @@ import Website.EventRentals.model.BlockoutDates;
 
 @RestController
 @RequestMapping("/api/admin/details")
-@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE })
+// @CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE })
 public class AdminDetailsController {
 
     @Value("${app.frontendUrl}")

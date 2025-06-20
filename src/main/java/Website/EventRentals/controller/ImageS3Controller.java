@@ -17,7 +17,7 @@ import Website.EventRentals.service.S3ServiceImage;
 
 @RestController
 @RequestMapping("/api/images")
-@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET })
+// @CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET })
 public class ImageS3Controller {
 
     private final S3ServiceImage s3ServiceImage;

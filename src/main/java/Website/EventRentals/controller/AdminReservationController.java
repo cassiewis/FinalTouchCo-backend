@@ -23,7 +23,7 @@ import Website.EventRentals.service.S3ServiceReservation;
 
 @RestController
 @RequestMapping("/api/admin/reservations")
-@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
+// @CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 public class AdminReservationController {
 
     private final AdminS3ServiceReservation adminS3ServiceReservation;

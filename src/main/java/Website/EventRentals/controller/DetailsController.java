@@ -20,7 +20,7 @@ import Website.EventRentals.service.S3ServiceDetails;
 
 @RestController
 @RequestMapping("/api/details")
-@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST })
+// @CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST })
 public class DetailsController {
 
     private final S3ServiceDetails s3ServiceDetails;

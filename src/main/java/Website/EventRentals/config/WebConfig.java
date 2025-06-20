@@ -12,17 +12,4 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${app.frontendUrl}")
     private String frontendUrl;
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(frontendUrl, "http://192.168.0.46:4200/")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("Content-Type", "Authorization", "X-Recaptcha-Token")
-                        .allowCredentials(true);
-            }
-        };
-    }
 }

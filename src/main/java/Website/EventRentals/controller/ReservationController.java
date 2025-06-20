@@ -28,11 +28,11 @@ import io.github.bucket4j.Refill;
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/reservations")
-@CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST })
+// @CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST })
 public class ReservationController {
 
     private final S3ServiceReservation s3ServiceReservation;
@@ -55,8 +55,10 @@ public class ReservationController {
         
         String ip = getClientIP(request);
         Bucket bucket = resolveBucket(ip);
+        System.out.println("CASSIE ReservationController: Adding reservation from IP: " + ip);
 
         if (!bucket.tryConsume(1)) {
+            System.out.println("CASSIE Rate limit exceeded for IP: " + ip + " | Available tokens: " + bucket.getAvailableTokens());
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(new ApiResponse<>(false, null, "Too many requests. Please try again later."));
         }
@@ -88,6 +90,7 @@ public class ReservationController {
 
         ResponseEntity<Map> response = restTemplate.postForEntity(url, params, Map.class);
         Map body = response.getBody();
+        System.out.println("CASSIE Recaptcha verification response: " + body);
         return (Boolean) body.get("success");
     }
 
@@ -109,7 +112,7 @@ public class ReservationController {
 
     private Bucket resolveBucket(String ip) {
         return buckets.computeIfAbsent(ip, k -> Bucket4j.builder()
-            .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1))))
+            .addLimit(Bandwidth.classic(50, Refill.greedy(50, Duration.ofMinutes(1))))
             .build());
     }
 }
