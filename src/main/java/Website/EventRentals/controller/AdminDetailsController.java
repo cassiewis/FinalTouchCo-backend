@@ -36,7 +36,7 @@ public class AdminDetailsController {
         this.adminS3ServiceDetails = adminS3ServiceDetails;
     }
 
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/reviews")
     public ResponseEntity<ApiResponse<Review>> addReview(@RequestBody Review review) {
         try {
@@ -53,7 +53,7 @@ public class AdminDetailsController {
         }
     }
 
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<ApiResponse<String>> removeReview(@PathVariable String reviewId) {
         try {
@@ -82,7 +82,7 @@ public class AdminDetailsController {
         }
     }
 
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/blockoutdates")
     public ResponseEntity<ApiResponse<BlockoutDates>> addBlockoutDates(@RequestBody BlockoutDates blockoutDates) {
         try {
@@ -97,7 +97,7 @@ public class AdminDetailsController {
         }
     }
 
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/blockoutdates/{id}")
     public ResponseEntity<ApiResponse<String>> removeBlockoutDate(@PathVariable String id) {
         try {

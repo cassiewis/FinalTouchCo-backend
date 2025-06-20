@@ -15,6 +15,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.Collections;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -25,8 +29,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
             throws ServletException, IOException {
 
-        System.out.println("CASSIE Incoming request: " + request.getMethod() + " " + request.getRequestURI());
-
         String path = request.getRequestURI();
         if (!path.startsWith("/api/admin")) {
             filterChain.doFilter(request, response);
@@ -35,9 +37,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = getJwtFromRequest(request);
 
         if (jwt != null && tokenProvider.validateToken(jwt)) {
-            // Token is valid, set a generic Authentication object for admin
+            // Token is valid, set Authentication object for admin with ROLE_ADMIN
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    "admin", null, null); // "admin" is a placeholder, no authorities needed
+                    "admin", null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
