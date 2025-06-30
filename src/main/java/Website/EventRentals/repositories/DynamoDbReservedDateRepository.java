@@ -52,7 +52,7 @@ public class DynamoDbReservedDateRepository {
                 .collect(Collectors.toList());
     }
 
-    public List<String> getAvailableProductIdsByDate(String date) {
+    public List<String> getProductIdsByDate(String date) {
         return reservedDateTable.index("date-productId-index") // Use the GSI name
                 .query(r -> r.queryConditional(QueryConditional.keyEqualTo(k -> k.partitionValue(date))))
                 .stream() // Stream over the pages

@@ -161,23 +161,56 @@ public class AdminS3ServiceReservation {
         }
 
         Reservation existingReservation = getReservation(reservationId);
-        if (!existingReservation.getDates().equals(updatedReservation.getDates())) { 
+        // if the dates have changed, then update the reserved dates in DynamoDB
+        if (!existingReservation.getDates().equals(updatedReservation.getDates())) {
             // dates have changed, remove old reserved dates
             List<ReservedDate> itemsToDelete = adminDynamoDbReservedDateService.queryByReservationId(reservationId);
             List<String> newDates = updatedReservation.getDates();
             
             for (ReservedDate date : itemsToDelete) {
-                String formattedDate = date.toString().substring(0, 10); // Assuming the date is in the format YYYY-MM-DD
+                // String formattedDate = date.toString().substring(0, 10); // Assuming the date is in the format YYYY-MM-DD
                 System.out.println("Cassie Removing reserved date for reservationId: " + reservationId + ", date: " + date);
-                adminDynamoDbReservedDateService.deleteReservedDate(reservationId, formattedDate);
+                adminDynamoDbReservedDateService.deleteReservedDate(reservationId, date.toString());
             }
             // add new reserved dates
             for (String date : newDates) {
-                String formattedDate = date.substring(0, 10); // Assuming the date is in the format YYYY-MM-DD
+                // String formattedDate = date.substring(0, 10); // Assuming the date is in the format YYYY-MM-DD
                 System.out.println("Cassie Adding reserved date for reservationId: " + reservationId + ", date: " + date);
-                adminDynamoDbReservedDateService.addReservedDate(reservationId, formattedDate, reservationId, updatedReservation.getStatus());
+                adminDynamoDbReservedDateService.addReservedDate(reservationId, date, reservationId, updatedReservation.getStatus());
             }
         }
+
+        // Check if any new items have been added or removed to the reservation
+        if (!existingReservation.getItemIds().equals(updatedReservation.getItemIds())) {
+            // Items have changed, update the reserved dates in DynamoDB
+            List<String> oldItems = existingReservation.getItemIds();
+            List<String> newItems = updatedReservation.getItemIds();
+
+            // Remove reserved dates for old items
+            for (String oldItem : oldItems) {
+                if (!newItems.contains(oldItem)) {
+                    System.out.println("Cassie Removing reserved dates for old item: " + oldItem);
+                    // Loop through each date and remove reserved date for each one
+                    for (String date : updatedReservation.getDates()) {
+                        // String formattedDate = date.substring(0, 10); // Assuming the date is in the format YYYY-MM-DD
+                        adminDynamoDbReservedDateService.deleteReservedDate(oldItem, date);
+                    }
+                }
+            }
+
+            // Add reserved dates for new items
+            for (String newItem : newItems) {
+                if (!oldItems.contains(newItem)) {
+                    System.out.println("Cassie Adding reserved dates for new item: " + newItem);
+                    // Loop through each date and add reserved date for each one
+                    for (String date : updatedReservation.getDates()) {
+                        // String formattedDate = date.substring(0, 10); // Assuming the date is in the format YYYY-MM-DD
+                        adminDynamoDbReservedDateService.addReservedDate(newItem, date, reservationId, updatedReservation.getStatus());
+                    }
+                }
+            }
+        }
+
 
         boolean success = putReservation(reservationId, updatedReservation);
 

@@ -20,7 +20,7 @@ public class AdminDynamoDbReservedDateService {
 
     public ReservedDate addReservedDate(String productId, String date, String reservationId, String status) {
         try {
-            ReservedDate reservedDate = new ReservedDate(productId, date, reservationId, status);
+            ReservedDate reservedDate = new ReservedDate(productId, date.substring(0, 10), reservationId, status);
             reservedDateRepository.save(reservedDate);
             return reservedDate;
         } catch (Exception e) {
@@ -29,10 +29,10 @@ public class AdminDynamoDbReservedDateService {
     }
 
     public void deleteReservedDate(String productId, String date) {
-        if (itemExists(productId, date)) {
-            reservedDateRepository.delete(productId, date);
+        if (itemExists(productId, date.substring(0, 10))) {
+            reservedDateRepository.delete(productId, date.substring(0, 10));
         } else {
-            throw new IllegalArgumentException("Reserved date not found for productId: " + productId + " and date: " + date);
+            throw new IllegalArgumentException("Reserved date not found for productId: " + productId + " and date: " + date.substring(0, 10));
         }
     }
 

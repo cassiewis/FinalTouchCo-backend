@@ -42,11 +42,20 @@ public class ReservedDateController {
         }
     }
 
-    @GetMapping("/availableProductIds/{date}")
+    @GetMapping("/productIds/{date}")
     // Endpoint to get all available product IDs for a specific date
-    public ResponseEntity<ApiResponse<List<String>>> getAvailableProductIdsByDate(String date) {
+    public ResponseEntity<ApiResponse<List<String>>> getProductIdsByDate(@PathVariable String date) {
         try {
-            List<String> productIds = dynamoDbReservedDateService.getAvailableProductIdsByDate(date);
+            // Extract just the date part (YYYY-MM-DD) from the incoming date string
+            String formattedDate;
+            if (date.length() >= 10) {
+                formattedDate = date.substring(0, 10); // Gets "2025-07-15" from "2025-07-15T06:00:00.000Z"
+            } else {
+                formattedDate = date; // Use as-is if it's already in the right format
+            }
+            System.out.println("Cassie: Original date: " + date + ", Formatted date: " + formattedDate);
+            
+            List<String> productIds = dynamoDbReservedDateService.getProductIdsByDate(formattedDate);
             return ResponseEntity.ok(new ApiResponse<>(true, productIds, "Available product IDs fetched successfully"));    
         } catch (IllegalArgumentException e) { // Client-side error (e.g., invalid status or reservation ID)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
