@@ -70,12 +70,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user = User.builder()
-            .username("admin")
-            .password(passwordEncoder().encode("password"))
-            .roles("ADMIN")
-            .build();
-        return new InMemoryUserDetailsManager(user);
+        return new InMemoryUserDetailsManager();
     }
 
     @Bean
@@ -88,7 +83,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList(frontendUrl, "http://localhost:4200"));
+        config.setAllowedOrigins(Arrays.asList(frontendUrl));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Recaptcha-Token"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         source.registerCorsConfiguration("/**", config);

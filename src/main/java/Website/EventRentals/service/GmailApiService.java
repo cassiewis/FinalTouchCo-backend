@@ -187,9 +187,7 @@ public class GmailApiService {
         // Build the authorization URL
         // Use the actual redirect URIs configured in Google Cloud Console
         String[] configuredRedirectUris = {
-            backendUrl + "/api/email/complete-oauth",
-            "http://localhost:8080/oauth2/callback",  // Keep for local development
-            "http://localhost:8888/Callback"
+            backendUrl + "/api/email/complete-oauth"
         };
         
         String scope = "https://www.googleapis.com/auth/gmail.send";

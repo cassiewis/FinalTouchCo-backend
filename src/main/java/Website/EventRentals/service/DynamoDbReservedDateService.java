@@ -42,7 +42,7 @@ public class DynamoDbReservedDateService {
         return list;
     }
 
-    // todo Fetch all products avaliable for a specific date (or date range??)
+    // Fetch all products avaliable for a specific date
     public List<String> getProductIdsByDate(String date) {
         List<String> list = reservedDateRepository.getProductIdsByDate(date);
         System.out.println("Cassie Available products for date " + date + ": " + list);
