@@ -32,7 +32,7 @@ public class GmailApiService {
     @Value("${app.backendUrl}")
     private String backendUrl;
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final String TOKENS_DIRECTORY_PATH = "/etc/secrets/";
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_SEND);
 
     @Value("${gmail.user.email:finaltouchco.info@gmail.com}")
