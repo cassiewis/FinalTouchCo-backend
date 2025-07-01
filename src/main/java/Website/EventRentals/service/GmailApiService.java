@@ -3,11 +3,11 @@ package Website.EventRentals.service;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
@@ -32,55 +32,48 @@ public class GmailApiService {
     @Value("${app.backendUrl}")
     private String backendUrl;
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "/etc/secrets/";
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_SEND);
 
     @Value("${gmail.user.email:finaltouchco.info@gmail.com}")
     private String userEmail;
 
     /**
-     * Creates an authorized Credential object.
+     * Creates an authorized Credential object using environment variables.
      */
     private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         String clientId = System.getenv("GOOGLE_CLIENT_ID");
         String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
+        String refreshToken = System.getenv("GOOGLE_REFRESH_TOKEN");
         
         if (clientId == null || clientSecret == null) {
             throw new IOException("Google OAuth credentials not found. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.");
         }
 
-        GoogleClientSecrets.Details details = new GoogleClientSecrets.Details();
-        details.setClientId(clientId);
-        details.setClientSecret(clientSecret);
-        
-        GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
-        clientSecrets.setInstalled(details);
-
-        // Build flow and trigger user authorization request
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-                .setAccessType("offline")
-                .build();
-        
-        // Try to load existing credentials
-        Credential credential = flow.loadCredential("user");
-        
-        if (credential != null && credential.getRefreshToken() != null) {
-            // Refresh the access token if needed
-            if (credential.getExpiresInSeconds() != null && credential.getExpiresInSeconds() <= 60) {
-                credential.refreshToken();
-            }
-            return credential;
+        if (refreshToken == null || refreshToken.trim().isEmpty()) {
+            throw new IOException(
+                "No refresh token found. Please set GOOGLE_REFRESH_TOKEN environment variable.\n" +
+                "You need to complete the OAuth setup process first by calling /api/email/setup-oauth"
+            );
         }
-        
-        // If no stored credentials, we need to do the OAuth flow
-        // For now, throw an exception with instructions
-        throw new IOException(
-            "No stored Gmail credentials found. Please run the OAuth setup process first.\n" +
-            "You need to authorize the application to send emails on your behalf.\n" +
-            "This is a one-time setup process."
-        );
+
+        try {
+            // Create credential with refresh token
+            GoogleCredential credential = new GoogleCredential.Builder()
+                .setTransport(HTTP_TRANSPORT)
+                .setJsonFactory(JSON_FACTORY)
+                .setClientSecrets(clientId, clientSecret)
+                .build()
+                .setRefreshToken(refreshToken);
+
+            // Refresh the access token
+            credential.refreshToken();
+            
+            System.out.println("Gmail credentials loaded successfully from environment variables");
+            return credential;
+            
+        } catch (Exception e) {
+            throw new IOException("Failed to create credentials from environment variables: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -185,8 +178,12 @@ public class GmailApiService {
         System.out.println("Client Secret: " + (clientSecret != null ? "***configured***" : "NOT SET"));
         
         // Build the authorization URL
-        // Use the actual redirect URIs configured in Google Cloud Console
+        // Try common redirect URI patterns that might already be configured
         String[] configuredRedirectUris = {
+            backendUrl,
+            backendUrl + "/",
+            backendUrl + "/oauth/callback",
+            backendUrl + "/auth/callback",
             backendUrl + "/api/email/complete-oauth"
         };
         
@@ -245,10 +242,9 @@ public class GmailApiService {
         GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
         clientSecrets.setInstalled(details);
 
-        // Build flow
+        // Build flow (without file storage)
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
                 .setAccessType("offline")
                 .build();
         
@@ -259,13 +255,24 @@ public class GmailApiService {
             
             var tokenResponse = tokenRequest.execute();
             
-            // Create and store the credential
-            Credential credential = flow.createAndStoreCredential(tokenResponse, "user");
+            System.out.println("=== OAUTH SETUP SUCCESSFUL ===");
+            System.out.println("Access token received: " + (tokenResponse.getAccessToken() != null ? "YES" : "NO"));
+            System.out.println("Refresh token received: " + (tokenResponse.getRefreshToken() != null ? "YES" : "NO"));
             
-            System.out.println("OAuth setup completed successfully!");
-            System.out.println("Credentials stored. Gmail API is now ready to send emails.");
-            System.out.println("Access token: " + (credential.getAccessToken() != null ? "***received***" : "NOT RECEIVED"));
-            System.out.println("Refresh token: " + (credential.getRefreshToken() != null ? "***received***" : "NOT RECEIVED"));
+            if (tokenResponse.getRefreshToken() != null) {
+                System.out.println("\n*** IMPORTANT: Set this as your GOOGLE_REFRESH_TOKEN environment variable ***");
+                System.out.println("REFRESH TOKEN (save as GOOGLE_REFRESH_TOKEN): " + tokenResponse.getRefreshToken());
+                System.out.println("*** Copy the token above and set it in your environment ***");
+            } else {
+                System.out.println("WARNING: No refresh token received. You may need to revoke access and try again with prompt=consent");
+            }
+            
+            System.out.println("=== NEXT STEPS ===");
+            System.out.println("1. Copy the refresh token above");
+            System.out.println("2. Set environment variable: export GOOGLE_REFRESH_TOKEN=\"your_refresh_token_here\"");
+            System.out.println("3. Restart your application");
+            System.out.println("4. Test email verification - it should now work for all users!");
+            System.out.println("=== END OAUTH SETUP ===");
             
             return true;
             
