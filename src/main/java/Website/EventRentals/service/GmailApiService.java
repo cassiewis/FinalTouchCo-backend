@@ -178,12 +178,8 @@ public class GmailApiService {
         System.out.println("Client Secret: " + (clientSecret != null ? "***configured***" : "NOT SET"));
         
         // Build the authorization URL
-        // Try common redirect URI patterns that might already be configured
+        // Use the actual redirect URIs configured in Google Cloud Console
         String[] configuredRedirectUris = {
-            backendUrl,
-            backendUrl + "/",
-            backendUrl + "/oauth/callback",
-            backendUrl + "/auth/callback",
             backendUrl + "/api/email/complete-oauth"
         };
         

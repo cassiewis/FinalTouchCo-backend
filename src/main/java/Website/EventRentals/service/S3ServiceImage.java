@@ -37,13 +37,14 @@ public class S3ServiceImage {
     public List<String> getInspoImageUrls() {
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(bucketName)
+                .prefix("Inspo/")  // Get all files in the inspo folder
                 .build();
 
         ListObjectsV2Response response = s3Client.listObjectsV2(request);
 
         return response.contents().stream()
                 .map(S3Object::key)
-                .filter(key -> key.startsWith("inspo-"))
+                .filter(key -> !key.equals("Inspo/"))  // Exclude the folder itself if it appears
                 .map(key -> String.format("https://%s.s3.amazonaws.com/%s", bucketName, key))
                 .collect(Collectors.toList());
     }
