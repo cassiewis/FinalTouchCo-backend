@@ -2,7 +2,7 @@ package Website.EventRentals.controller;
 
 import Website.EventRentals.model.ApiResponse;
 import Website.EventRentals.service.EmailVerificationService;
-import Website.EventRentals.service.GmailApiService;
+import Website.EventRentals.service.SimpleEmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ public class EmailController {
     private EmailVerificationService emailVerificationService;
     
     @Autowired
-    private GmailApiService gmailApiService;
+    private SimpleEmailService simpleEmailService;
 
     @PostMapping("/send-verification")
     public ResponseEntity<ApiResponse<String>> sendVerificationCode(@RequestBody Map<String, String> request) {
@@ -66,50 +66,22 @@ public class EmailController {
         }
     }
 
-    @GetMapping("/setup-oauth")
-    public ResponseEntity<ApiResponse<String>> setupOAuth() {
+    @GetMapping("/test-email")
+    public ResponseEntity<ApiResponse<String>> testEmail() {
         try {
-            gmailApiService.authorizeGmailAccess();
-            return ResponseEntity.ok(
-                new ApiResponse<>(true, "OAuth setup initiated", 
-                "Check the console logs for authorization URL and instructions")
-            );
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                .body(new ApiResponse<>(false, null, "Error setting up OAuth: " + e.getMessage()));
-        }
-    }
-
-    @PostMapping("/complete-oauth")
-    public ResponseEntity<ApiResponse<String>> completeOAuth(@RequestBody Map<String, String> request) {
-        try {
-            String authorizationCode = request.get("code");
-            String redirectUri = request.get("redirectUri"); // Optional
-            
-            if (authorizationCode == null || authorizationCode.trim().isEmpty()) {
-                return ResponseEntity.badRequest()
-                    .body(new ApiResponse<>(false, null, "Authorization code is required"));
-            }
-
-            boolean success;
-            if (redirectUri != null && !redirectUri.trim().isEmpty()) {
-                success = gmailApiService.completeOAuthFlow(authorizationCode, redirectUri);
-            } else {
-                success = gmailApiService.completeOAuthFlow(authorizationCode);
-            }
-            
+            boolean success = simpleEmailService.testEmailConfiguration();
             if (success) {
                 return ResponseEntity.ok(
-                    new ApiResponse<>(true, "OAuth completed", 
-                    "Gmail API is now configured and ready to send emails")
+                    new ApiResponse<>(true, "Email test completed", 
+                    "Check console logs to see if email was sent or if it's in development mode")
                 );
             } else {
                 return ResponseEntity.internalServerError()
-                    .body(new ApiResponse<>(false, null, "Failed to complete OAuth setup"));
+                    .body(new ApiResponse<>(false, null, "Email test failed"));
             }
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                .body(new ApiResponse<>(false, null, "Error completing OAuth: " + e.getMessage()));
+                .body(new ApiResponse<>(false, null, "Error testing email: " + e.getMessage()));
         }
     }
 }

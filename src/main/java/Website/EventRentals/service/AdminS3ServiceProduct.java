@@ -53,8 +53,8 @@ public class AdminS3ServiceProduct {
                             .build(),
                     RequestBody.fromString(productJson)
             );
-            // After uploading, set the product ID (or other details) and return the product
-            product.setProductId(key); // Optional: set the S3 key as the product ID or update the product object
+            // Don't modify the productId - it should remain without .json extension
+            // The .json is only for S3 storage, not for the product identifier
             return product; // Return the product object
         } catch (S3Exception e) {
             throw new RuntimeException("Error uploading product to S3: " + e.awsErrorDetails().errorMessage(), e);
@@ -75,6 +75,47 @@ public class AdminS3ServiceProduct {
                     .map(this::getProductFromObject)
                     .filter(product -> product != null) // Filter out null values
                     .collect(Collectors.toList());
+            
+            // Clean up any products that have .json in their productId
+            for (Product product : products) {
+                if (product.getProductId().endsWith(".json")) {
+                    String oldProductId = product.getProductId();
+                    String cleanProductId = oldProductId.replace(".json", "");
+                    
+                    System.out.println("Auto-cleaning product ID: " + oldProductId + " -> " + cleanProductId);
+                    
+                    // Update the product with clean ID
+                    product.setProductId(cleanProductId);
+                    
+                    // Save the updated product (this will create a new file with clean ID)
+                    String updatedProductJson = productToJson(product);
+                    String newKey = cleanProductId + ".json";
+                    
+                    s3Client.putObject(
+                        PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(newKey)
+                            .contentType("application/json")
+                            .build(),
+                        RequestBody.fromString(updatedProductJson)
+                    );
+                    
+                    // Delete the old file with the messy key
+                    String oldKey = oldProductId + ".json"; // This would be "productId.json.json"
+                    try {
+                        s3Client.deleteObject(
+                            DeleteObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(oldKey)
+                                .build()
+                        );
+                        System.out.println("Deleted old file: " + oldKey);
+                    } catch (Exception e) {
+                        System.err.println("Could not delete old file " + oldKey + ": " + e.getMessage());
+                    }
+                }
+            }
+            
             return products;
         } catch (S3Exception e) {
             throw new RuntimeException("Error fetching products from S3: " + e.awsErrorDetails().errorMessage(), e);
@@ -105,7 +146,13 @@ public class AdminS3ServiceProduct {
 
     // Update an existing product in S3
     public Product updateProduct(String productId, Product updatedProduct) {
-        String key = productId.endsWith(".json") ? productId : productId + ".json";
+        // Always ensure we're working with clean productId (no .json extension)
+        String cleanProductId = productId.replace(".json", "");
+        String key = cleanProductId + ".json";
+        
+        // Also ensure the product object has clean ID
+        updatedProduct.setProductId(cleanProductId);
+        
         String updatedProductJson = productToJson(updatedProduct);
         try {
             s3Client.putObject(
@@ -124,7 +171,9 @@ public class AdminS3ServiceProduct {
 
     // Method to delete a product from S3 using its productId
     public void deleteProduct(String productId) {
-        String key = productId + ".json"; // Assuming the product is stored with a key that ends in ".json"
+        // Always ensure we're working with clean productId (no .json extension)
+        String cleanProductId = productId.replace(".json", "");
+        String key = cleanProductId + ".json";
 
         try {
             // Deleting the object from S3
@@ -134,7 +183,7 @@ public class AdminS3ServiceProduct {
                     .build();
 
             s3Client.deleteObject(deleteObjectRequest);
-            System.out.println("Successfully deleted product with ID: " + productId);
+            System.out.println("Successfully deleted product with ID: " + cleanProductId);
         } catch (Exception e) {
             throw new RuntimeException("Error deleting product from S3: " + e.getMessage(), e);
         }
@@ -161,7 +210,9 @@ public class AdminS3ServiceProduct {
     // Helper method to fetch the JSON string from S3 and map it to a Product object
     private Product getProductFromObject(S3Object s3Object) {
         try {
-            return getProduct(s3Object.key().replace(".json", ""));
+            // Extract productId by removing .json extension from the S3 key
+            String productId = s3Object.key().replace(".json", "");
+            return getProduct(productId);
         } catch (RuntimeException e) {
             return null; // Log or handle if needed
         }

@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EmailVerificationService {
 
     @Autowired
-    private GmailApiService gmailApiService;
+    private SimpleEmailService simpleEmailService;
 
-    @Value("${gmail.user.email:finaltouchco.info@gmail.com}")
+    @Value("${gmail.user.email:finaltouchdecor.co@gmail.com}")
     private String fromEmail;
     
     @Value("${app.email.provider:gmail}")
@@ -49,12 +49,12 @@ public class EmailVerificationService {
                 "Thank you for renting from Final Touch!", 
                 code, CODE_EXPIRY_MINUTES);
             
-            emailSent = gmailApiService.sendEmail(email, subject, message);
+            emailSent = simpleEmailService.sendEmail(email, subject, message);
             
             if (emailSent) {
-                System.out.println("Gmail API: Verification email sent successfully to: " + email);
+                System.out.println("Simple Email Service: Verification email sent successfully to: " + email);
             } else {
-                System.err.println("Gmail API: Failed to send verification email to: " + email);
+                System.err.println("Simple Email Service: Failed to send verification email to: " + email);
             }
             
             // Clean up expired codes

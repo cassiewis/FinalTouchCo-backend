@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/email/verify-code").permitAll()
                 .requestMatchers("/api/email/setup-oauth").permitAll()
                 .requestMatchers("/api/email/complete-oauth").permitAll()
+                .requestMatchers("/api/email/test-email").permitAll()
                 .requestMatchers("/api/admin/**").authenticated()
                 .anyRequest().authenticated()
             )
