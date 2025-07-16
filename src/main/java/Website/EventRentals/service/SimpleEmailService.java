@@ -8,6 +8,11 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.util.Properties;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import Website.EventRentals.model.Reservation;
+
 /**
  * Simple email service using Gmail SMTP with App Password
  * This approach is more reliable than OAuth tokens and doesn't expire
@@ -121,5 +126,18 @@ public class SimpleEmailService {
      */
     public boolean testEmailConfiguration() {
         return sendEmail(userEmail, "Test Email", "This is a test email from Event Rentals system.");
+    }
+
+
+    public void sendNewReservationNotification(Reservation reservation) {
+        String subject = "New Reservation Created For: " + reservation.getName();
+        String body = String.format(
+            "Dates: %s - %s\nTotal Price: %s\nNumber of Items: %d\n",
+            reservation.getStartDate().substring(0, 10),
+            reservation.getEndDate().substring(0, 10),
+            reservation.getPrice(),
+            reservation.getNumberOfItems()
+        );
+        sendEmail("finaltouchdecor.co@gmail.com", subject, body);
     }
 }

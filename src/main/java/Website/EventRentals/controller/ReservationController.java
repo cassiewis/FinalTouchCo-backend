@@ -32,7 +32,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/reservations")
-// @CrossOrigin(origins = "https://finaltouchco-frontend.onrender.com", allowedHeaders = "*", methods = { RequestMethod.GET, RequestMethod.POST })
 public class ReservationController {
 
     private final S3ServiceReservation s3ServiceReservation;

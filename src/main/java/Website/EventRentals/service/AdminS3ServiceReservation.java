@@ -160,6 +160,8 @@ public class AdminS3ServiceReservation {
             throw new IllegalArgumentException("Reservation ID in the URL and request body must match.");
         }
 
+        System.out.println("Cassie Updating reservation with ID: " + reservationId);
+
         Reservation existingReservation = getReservation(reservationId);
         // if the dates have changed, then update the reserved dates in DynamoDB
         if (!existingReservation.getDates().equals(updatedReservation.getDates())) {

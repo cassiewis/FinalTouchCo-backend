@@ -62,6 +62,14 @@ public class Reservation {
         this.dates = dates;
     }
 
+    public String getStartDate() {
+        return this.dates != null && !this.dates.isEmpty() ? this.dates.get(0) : null;
+    }
+
+    public String getEndDate() {
+        return this.dates != null && this.dates.size() > 1 ? this.dates.get(1) : null;
+    }
+
     // Getter and Setter for pickupNotes
     public String getPickupNotes() {
         return this.pickupNotes;
@@ -80,6 +88,10 @@ public class Reservation {
     public List <String> getItemIds() {
         System.out.println("getItemIds() called. Items: " + (items == null ? "null" : items.size()));
         return this.items.stream().map(ReservedItem::getProductId).toList();
+    }
+
+    public int getNumberOfItems() {
+        return this.items != null ? this.items.size() : 0;
     }
 
     public void setItems(List<ReservedItem> items) {

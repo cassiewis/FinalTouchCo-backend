@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+
 import Website.EventRentals.filter.JwtAuthenticationFilter;
 
 @Configuration
@@ -43,11 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/images", "/api/images/**").permitAll()
                 .requestMatchers("/api/details", "/api/details/**").permitAll()
                 .requestMatchers("/api/reservedDates", "/api/reservedDates/**").permitAll()
-                .requestMatchers("/api/email/send-verification").permitAll()
-                .requestMatchers("/api/email/verify-code").permitAll()
-                .requestMatchers("/api/email/setup-oauth").permitAll()
-                .requestMatchers("/api/email/complete-oauth").permitAll()
-                .requestMatchers("/api/email/test-email").permitAll()
+                .requestMatchers("/api/email/**").permitAll()
                 .requestMatchers("/api/admin/**").authenticated()
                 .anyRequest().authenticated()
             )
@@ -71,7 +68,12 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new InMemoryUserDetailsManager();
+        UserDetails user = User.builder()
+            .username("admin")
+            .password(passwordEncoder().encode("password"))
+            .roles("ADMIN")
+            .build();
+        return new InMemoryUserDetailsManager(user);
     }
 
     @Bean
@@ -84,7 +86,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList(frontendUrl));
+        config.setAllowedOrigins(Arrays.asList(frontendUrl, "http://localhost:4200"));
         config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Recaptcha-Token"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         source.registerCorsConfiguration("/**", config);

@@ -100,6 +100,7 @@ public class AdminReservationController {
     @PutMapping("/{reservationId}")
     public ResponseEntity<ApiResponse<String>> updateReservation(@PathVariable String reservationId, @RequestBody Reservation updatedReservation) {
         try {
+            System.out.println("Cassie AdminReservationController: Updating reservation with ID: " + reservationId);
             adminS3ServiceReservation.updateReservation(reservationId, updatedReservation);
             return ResponseEntity.ok(new ApiResponse<>(true, "Reservation updated successfully", null));
         } catch (IllegalArgumentException e) { // Client-side error (e.g., invalid status or reservation ID)
