@@ -8,6 +8,7 @@ public class ReservedItem {
     private double price;
     private double deposit;
     private String description;
+    private String imageUrl;
 
    public String getProductId() {
     return this.productId;
@@ -56,4 +57,12 @@ public class ReservedItem {
    public void setDescription(String description) {
     this.description = description;
    }
+
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

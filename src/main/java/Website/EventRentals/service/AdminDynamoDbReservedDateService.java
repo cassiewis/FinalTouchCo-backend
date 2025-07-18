@@ -32,7 +32,15 @@ public class AdminDynamoDbReservedDateService {
         if (itemExists(productId, date.substring(0, 10))) {
             reservedDateRepository.delete(productId, date.substring(0, 10));
         } else {
-            throw new IllegalArgumentException("Reserved date not found for productId: " + productId + " and date: " + date.substring(0, 10));
+            // Do nothing since date is already not there, maybe send warning in the future?
+            // throw new IllegalArgumentException("Reserved date not found for productId: " + productId + " and date: " + date.substring(0, 10));
+        }
+    }
+
+    public void removeAllDatesRelatedToReservationId(String reservationId) {
+        List<ReservedDate> reservedDates = reservedDateRepository.queryByReservationId(reservationId);
+        for (ReservedDate reservedDate : reservedDates) {
+            reservedDateRepository.delete(reservedDate.getProductId(), reservedDate.getDate());
         }
     }
 

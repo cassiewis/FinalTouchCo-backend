@@ -133,8 +133,8 @@ public class SimpleEmailService {
         String subject = "New Reservation Created For: " + reservation.getName();
         String body = String.format(
             "Dates: %s - %s\nTotal Price: %s\nNumber of Items: %d\n",
-            reservation.getStartDate().substring(0, 10),
-            reservation.getEndDate().substring(0, 10),
+            reservation.getDates().get(0).substring(0, 10),
+            reservation.getDates().size() > 1 ? reservation.getDates().get(1).substring(0, 10) : "N/A",
             reservation.getPrice(),
             reservation.getNumberOfItems()
         );
