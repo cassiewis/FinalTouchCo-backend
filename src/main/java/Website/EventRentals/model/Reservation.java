@@ -62,13 +62,13 @@ public class Reservation {
         this.dates = dates;
     }
 
-    public String getStartDate() {
-        return this.dates != null && !this.dates.isEmpty() ? this.dates.get(0) : null;
-    }
+    // public String getStartDate() {
+    //     return this.dates != null && !this.dates.isEmpty() ? this.dates.get(0) : null;
+    // }
 
-    public String getEndDate() {
-        return this.dates != null && this.dates.size() > 1 ? this.dates.get(1) : null;
-    }
+    // public String getEndDate() {
+    //     return this.dates != null && this.dates.size() > 1 ? this.dates.get(1) : null;
+    // }
 
     // Getter and Setter for pickupNotes
     public String getPickupNotes() {

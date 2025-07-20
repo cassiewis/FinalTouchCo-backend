@@ -84,7 +84,7 @@ public class EmailVerificationService {
             }
             
             // Check if code matches
-            boolean isValid = storedData.code.equals(code);
+            boolean isValid = storedData.code.equals(code.replaceAll("[^\\d]", ""));
             
             if (isValid) {
                 verificationCodes.remove(email); // Remove used code
