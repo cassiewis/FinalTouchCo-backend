@@ -23,18 +23,23 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+import Website.EventRentals.service.AdminCalendarService;
+
 @Service
 public class AdminS3ServiceReservation {
     private final S3Client s3Client;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final AdminDynamoDbReservedDateService adminDynamoDbReservedDateService;
+    private final AdminCalendarService adminCalendarService;
 
     private final String bucketName = "reservations-bucket-final-touch";
 
     public AdminS3ServiceReservation(@Qualifier("adminS3Client") S3Client adminS3Client, 
-                                    AdminDynamoDbReservedDateService adminDynamoDbReservedDateService) {
+                                    AdminDynamoDbReservedDateService adminDynamoDbReservedDateService,
+                                    AdminCalendarService adminCalendarService) {
         this.s3Client = adminS3Client;
         this.adminDynamoDbReservedDateService = adminDynamoDbReservedDateService;
+        this.adminCalendarService = adminCalendarService;
     }
 
     // Fetch all reservations from S3
@@ -161,8 +166,6 @@ public class AdminS3ServiceReservation {
             throw new IllegalArgumentException("Reservation ID in the URL and request body must match.");
         }
 
-        System.out.println("Cassie Updating reservation with ID: " + reservationId);
-
         Reservation existingReservation = getReservation(reservationId);
         // if the dates have changed, then update the reserved dates in DynamoDB. Also make sure status is active
         if (!existingReservation.getDates().equals(updatedReservation.getDates()) && updatedReservation.getStatus().equals("active")) {
@@ -256,6 +259,12 @@ public class AdminS3ServiceReservation {
                         adminDynamoDbReservedDateService.addReservedDate(productId, reservedDate, reservationId, "active");
                     }
                 }
+                // add reservation to calendar
+                // String title = "Reservation: " + reservation.getName();
+                // String description = "Reservation ID: " + reservationId + "\n" +
+                //         "Items: " + reservation.getItemIds().stream().collect(Collectors.joining(", ")) + "\n" +
+                //         "Description: " + reservation.getDescription();
+                // adminCalendarService.createEvent(title, description, reservation.getStartDateTime(), reservation.getDurationMinutes());
             } else if (status.equals("fulfilled") || status.equals("canceled") || status.equals("pending")) {
                 System.out.println("Removing all reserved dates for reservationId: " + reservationId);
 

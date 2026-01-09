@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/images", "/api/images/**").permitAll()
                 .requestMatchers("/api/details", "/api/details/**").permitAll()
                 .requestMatchers("/api/reservedDates", "/api/reservedDates/**").permitAll()
-                .requestMatchers("/api/email/**").permitAll()
+                .requestMatchers("/api/email/**", "/api/email").permitAll()
                 .requestMatchers("/api/admin/**").authenticated()
                 .anyRequest().authenticated()
             )
@@ -81,14 +81,15 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(Arrays.asList(frontendUrl, "http://localhost:4200"));
-        config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Recaptcha-Token"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
+        config.setExposedHeaders(Arrays.asList("Authorization")); // Expose headers if needed
         source.registerCorsConfiguration("/**", config);
         return source;
     }
