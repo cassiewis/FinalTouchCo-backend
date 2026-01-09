@@ -23,23 +23,23 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-// import Website.EventRentals.service.AdminCalendarService;
+import Website.EventRentals.service.AdminCalendarService;
 
 @Service
 public class AdminS3ServiceReservation {
     private final S3Client s3Client;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final AdminDynamoDbReservedDateService adminDynamoDbReservedDateService;
-    // private final AdminCalendarService adminCalendarService;
+    private final AdminCalendarService adminCalendarService;
 
     private final String bucketName = "reservations-bucket-final-touch";
 
     public AdminS3ServiceReservation(@Qualifier("adminS3Client") S3Client adminS3Client, 
-                                    AdminDynamoDbReservedDateService adminDynamoDbReservedDateService
-                                    ) {
+                                    AdminDynamoDbReservedDateService adminDynamoDbReservedDateService,
+                                    AdminCalendarService adminCalendarService) {
         this.s3Client = adminS3Client;
         this.adminDynamoDbReservedDateService = adminDynamoDbReservedDateService;
-        // this.adminCalendarService = adminCalendarService;
+        this.adminCalendarService = adminCalendarService;
     }
 
     // Fetch all reservations from S3
