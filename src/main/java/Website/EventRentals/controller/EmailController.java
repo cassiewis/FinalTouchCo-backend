@@ -139,7 +139,6 @@ public class EmailController {
             String eventDate = (String) request.get("eventDate");
             String venue = (String) request.get("venue");
             String products = (String) request.get("products");
-            String setupService = (String) request.get("setupService");
             String message = (String) request.get("message");
             String hearAboutUs = (String) request.get("hearAboutUs");
             
@@ -174,13 +173,11 @@ public class EmailController {
                 "Rental Details:\n" +
                 "Items Interested In: %s\n" +
                 "Delivery Options: %s\n" +
-                "Setup Service: %s\n\n" +
                 "Additional Information:\n" +
                 "Message: %s\n" +
                 "How they heard about us: %s\n",
                 name, email, eventType, eventDate, venue, products, 
                 deliveryOptions.isEmpty() ? "Not specified" : deliveryOptions,
-                setupService != null ? setupService : "Not specified",
                 message != null && !message.trim().isEmpty() ? message : "No additional message",
                 hearAboutUs != null ? hearAboutUs : "Not specified"
             );

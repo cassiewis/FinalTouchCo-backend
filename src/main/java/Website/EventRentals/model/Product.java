@@ -11,6 +11,7 @@ public class Product {
     private double price;
     private double deposit;
     private String description;
+    private String customDescription;
     private String imageUrl; // Store the S3 URL for the image
     private final List<LocalDate> datesReserved = null;
     private List<String> tags;
@@ -80,6 +81,14 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCustomDescription() {
+        return customDescription;
+    }
+
+    public void setCustomDescription(String customDescription) {
+        this.customDescription = customDescription;
     }
 
     public String getImageUrl() {
